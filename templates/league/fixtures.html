@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Fixtures{% endblock %}
+{% block content %}
+<div class="heading-row">
+  <h1>Matchday {{ matchday }}</h1>
+  <form method="get" class="inline">
+    <label for="matchday">Matchday</label>
+    <select id="matchday" name="matchday" onchange="this.form.submit()">
+      {% for md in matchdays %}<option value="{{ md }}"{% if md == matchday %} selected{% endif %}>Matchday {{ md }}</option>{% endfor %}
+    </select>
+    <noscript><button type="submit">Show</button></noscript>
+  </form>
+</div>
+<nav class="pager">
+  {% if matchday > 1 %}<a href="?matchday={{ matchday|add:'-1' }}">&larr; Matchday {{ matchday|add:"-1" }}</a>{% endif %}
+  {% if matchday < matchdays|length %}<a href="?matchday={{ matchday|add:'1' }}">Matchday {{ matchday|add:"1" }} &rarr;</a>{% endif %}
+</nav>
+{% for day, day_fixtures in days %}
+  <section class="day" data-day="{{ day|date:'Y-m-d' }}">
+    <h2>{{ day|date:"l j F Y" }}</h2>
+    <ul class="fixture-list">
+      {% for fixture in day_fixtures %}
+        <li class="fixture {{ fixture.status }}" data-fixture-id="{{ fixture.pk }}">
+          <span class="time">{{ fixture.kickoff|time:"H:i" }}</span>
+          <span class="home">{{ fixture.home_team.name }}</span>
+          <a class="score" href="{% url 'fixture_detail' fixture.pk %}">{% if fixture.is_played %}{{ fixture.score }}{% elif fixture.status == "postponed" %}P-P{% else %}v{% endif %}</a>
+          <span class="away">{{ fixture.away_team.name }}</span>
+          <span class="pitch muted">{{ fixture.pitch }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% empty %}
+  <p class="muted">No fixtures for this matchday.</p>
+{% endfor %}
+{% endblock %}

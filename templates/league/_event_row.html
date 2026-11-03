@@ -1,0 +1,7 @@
+<div class="event-row">
+  {{ form.player }}
+  {% if form.colour %}{{ form.colour }}{% endif %}
+  <label class="minute">Min {{ form.minute }}</label>
+  {% if form.DELETE %}<label class="remove">{{ form.DELETE }} Remove</label>{% endif %}
+  {% if form.errors %}<span class="error">{% for field, errs in form.errors.items %}{{ errs|join:" " }} {% endfor %}</span>{% endif %}
+</div>

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load league_extras %}
+{% block title %}{{ team.name }}{% endblock %}
+{% block content %}
+<div class="heading-row">
+  <h1>{{ team.name }}</h1>
+  {% if row %}<p class="position">{{ row.position|ordinal }} · {{ row.points }} pts</p>{% endif %}
+</div>
+<p class="muted">{{ team.colours }}</p>
+
+<div class="columns">
+  <section class="card">
+    <h2>Squad</h2>
+    <table class="table" data-testid="squad">
+      <thead><tr><th class="num">No.</th><th>Name</th><th>Position</th><th class="num">Goals</th>{% if can_manage %}<th></th>{% endif %}</tr></thead>
+      <tbody>
+        {% for player in squad %}
+          <tr data-player="{{ player.name }}">
+            <td class="num">{{ player.shirt_number }}</td>
+            <td>{{ player.name }}</td>
+            <td>{{ player.get_position_display }}</td>
+            <td class="num">{{ player.goals_scored }}</td>
+            {% if can_manage %}
+              <td>
+                <form method="post" action="{% url 'remove_player' player.pk %}" onsubmit="return confirm('Remove {{ player.name|escapejs }} from the squad?')">
+                  {% csrf_token %}<button type="submit" class="link">Remove</button>
+                </form>
+              </td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if can_manage %}<a class="button" href="{% url 'add_player' team.pk %}">Add player</a>{% endif %}
+  </section>
+
+  <section class="card">
+    <h2>Next match</h2>
+    {% if next_fixture %}
+      <p class="next-fixture">
+        <a href="{% url 'fixture_detail' next_fixture.pk %}">{{ next_fixture.home_team }} v {{ next_fixture.away_team }}</a><br>
+        <span class="next-date">{{ next_fixture.kickoff|matchdate }}</span>, {{ next_fixture.kickoff|time:"H:i" }} · {{ next_fixture.pitch }}
+      </p>
+    {% else %}
+      <p class="muted">No fixtures left.</p>
+    {% endif %}
+    <h2>Last results</h2>
+    <ul class="results">
+      {% for fixture, letter in results %}
+        <li><span class="badge {{ letter }}">{{ letter }}</span> <a href="{% url 'fixture_detail' fixture.pk %}">{{ fixture.home_team.short_name }} {{ fixture.score }} {{ fixture.away_team.short_name }}</a></li>
+      {% empty %}
+        <li class="muted">No results yet.</li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>
+{% endblock %}

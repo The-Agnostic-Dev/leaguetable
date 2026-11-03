@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Top scorers{% endblock %}
+{% block content %}
+<h1>Top scorers</h1>
+<p class="muted"><span data-testid="scorer-total">{{ total }}</span> players have scored this season. Own goals are not counted.</p>
+<table class="table" id="scorers" data-more-url="{% url 'scorers_more' %}">
+  <thead><tr><th class="num">#</th><th>Player</th><th>Team</th><th class="num">Goals</th></tr></thead>
+  <tbody>
+    {% include "league/_scorer_rows.html" %}
+    {% if has_more %}
+      <tr class="more-row"><td colspan="4"><button type="button" class="secondary" id="show-more">Show more</button></td></tr>
+    {% endif %}
+  </tbody>
+</table>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/scorers.js' %}"></script>{% endblock %}

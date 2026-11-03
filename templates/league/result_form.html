@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Result: {{ fixture }}{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>{% if fixture.is_played %}Edit result{% else %}Enter result{% endif %}</h1>
+  <p class="muted">Matchday {{ fixture.matchday }} · {{ fixture.home_team }} v {{ fixture.away_team }}</p>
+
+  <form method="post" id="result-form">
+    {% csrf_token %}
+    {% if entry.errors %}<ul class="messages">{% for error in entry.errors %}<li class="error">{{ error }}</li>{% endfor %}</ul>{% endif %}
+
+    <div class="score-inputs">
+      <label for="id_home_goals">{{ fixture.home_team }}</label>
+      {{ entry.score.home_goals }}
+      <span>-</span>
+      {{ entry.score.away_goals }}
+      <label for="id_away_goals">{{ fixture.away_team }}</label>
+    </div>
+    {% if entry.score.errors %}<p class="error">{% for field, errs in entry.score.errors.items %}{{ errs|join:" " }} {% endfor %}</p>{% endif %}
+
+    <fieldset>
+      <legend>Goalscorers</legend>
+      <p class="muted small">Own goals are not credited to a player, so leave them out.</p>
+      {{ entry.goals.management_form }}
+      <div id="goals-rows">
+        {% for form in entry.goals %}{% include "league/_event_row.html" %}{% endfor %}
+      </div>
+      <button type="button" class="secondary" data-add-row="goals">Add scorer</button>
+      <template id="goal-empty-form">{% with form=entry.goals.empty_form %}{% include "league/_event_row.html" %}{% endwith %}</template>
+    </fieldset>
+
+    <fieldset>
+      <legend>Cards</legend>
+      <p class="muted small">A second yellow in the same match is entered as a red card.</p>
+      {{ entry.cards.management_form }}
+      <div id="cards-rows">
+        {% for form in entry.cards %}{% include "league/_event_row.html" %}{% endfor %}
+      </div>
+      <button type="button" class="secondary" data-add-row="cards">Add card</button>
+      <template id="cards-empty-form">{% with form=entry.cards.empty_form %}{% include "league/_event_row.html" %}{% endwith %}</template>
+    </fieldset>
+
+    <div class="actions">
+      <button type="submit">Save result</button>
+      <a href="{% url 'fixture_detail' fixture.pk %}">Cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/result_form.js' %}"></script>{% endblock %}

@@ -1,0 +1,8 @@
+{% for row in rows %}
+  <tr data-player="{{ row.player.pk }}">
+    <td class="num rank">{{ row.rank }}</td>
+    <td class="name">{{ row.player.name }}</td>
+    <td class="team"><a href="{% url 'team_detail' row.team.pk %}">{{ row.team.name }}</a></td>
+    <td class="num goals">{{ row.goals }}</td>
+  </tr>
+{% endfor %}

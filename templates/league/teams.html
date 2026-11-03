@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Teams{% endblock %}
+{% block content %}
+<h1>Teams</h1>
+<ul class="team-grid">
+  {% for team in teams %}
+    <li class="card">
+      <h2><a href="{% url 'team_detail' team.pk %}">{{ team.name }}</a></h2>
+      <p class="muted">{{ team.colours }} · {{ team.squad_size }} players</p>
+      {% if team.captain %}<p class="small">Captain login: {{ team.captain.get_full_name|default:team.captain.username }}</p>{% endif %}
+    </li>
+  {% endfor %}
+</ul>
+{% endblock %}

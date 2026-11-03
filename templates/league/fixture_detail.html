@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load league_extras %}
+{% block title %}{{ fixture }}{% endblock %}
+{% block content %}
+<section class="card match">
+  <p class="muted">Matchday {{ fixture.matchday }} · <span class="match-date">{{ fixture.kickoff|matchdate }}</span> · <span class="match-time">{{ fixture.kickoff|time:"H:i" }}</span> · {{ fixture.pitch }}</p>
+  <div class="scoreline">
+    <a href="{% url 'team_detail' fixture.home_team.pk %}">{{ fixture.home_team.name }}</a>
+    <strong class="score" data-testid="score">{% if fixture.is_played %}{{ fixture.score }}{% else %}{{ fixture.get_status_display }}{% endif %}</strong>
+    <a href="{% url 'team_detail' fixture.away_team.pk %}">{{ fixture.away_team.name }}</a>
+  </div>
+  {% if fixture.is_played %}
+    <div class="scorers-grid">
+      <ul class="goals home">{% for goal in home_goals %}<li>{{ goal.player.name }} {{ goal.minute }}'</li>{% endfor %}</ul>
+      <ul class="goals away">{% for goal in away_goals %}<li>{{ goal.player.name }} {{ goal.minute }}'</li>{% endfor %}</ul>
+    </div>
+    {% if cards %}
+      <h2>Cards</h2>
+      <ul class="cards" data-testid="cards">
+        {% for card in cards %}<li><span class="card-chip {{ card.colour }}">{{ card.get_colour_display }}</span> {{ card.player.name }} ({{ card.player.team.short_name }}) {{ card.minute }}'</li>{% endfor %}
+      </ul>
+    {% endif %}
+  {% endif %}
+  <div class="actions">
+    {% if can_enter_results and fixture.status != "postponed" %}
+      <a class="button" href="{% url 'enter_result' fixture.pk %}">{% if fixture.is_played %}Edit result{% else %}Enter result{% endif %}</a>
+    {% endif %}
+    {% if is_secretary %}
+      <a class="button secondary" href="{% url 'edit_fixture' fixture.pk %}">Reschedule</a>
+      {% if fixture.is_played %}
+        <form method="post" action="{% url 'clear_result' fixture.pk %}" onsubmit="return confirm('Clear this result? Scorers and cards are removed too.')">
+          {% csrf_token %}<button type="submit" class="danger">Clear result</button>
+        </form>
+      {% endif %}
+    {% endif %}
+  </div>
+</section>
+<p><a href="{% url 'fixtures' %}?matchday={{ fixture.matchday }}">&larr; Matchday {{ fixture.matchday }}</a></p>
+{% endblock %}

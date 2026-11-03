@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Add player{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>Add player to {{ team.name }}</h1>
+  <form method="post">
+    {% csrf_token %}
+    <label for="id_name">Full name</label>
+    <input type="text" name="name" id="id_name" value="{{ form.name.value|default:'' }}" maxlength="80" required
+           pattern="[A-Za-z ]+" title="Use the player's name as it appears on his ID">
+    {% for error in form.name.errors %}<p class="error">{{ error }}</p>{% endfor %}
+
+    <label for="id_shirt_number">Shirt number</label>
+    <input type="number" name="shirt_number" id="id_shirt_number" value="{{ form.shirt_number.value|default:'' }}" min="1" max="99" required>
+    {% for error in form.shirt_number.errors %}<p class="error">{{ error }}</p>{% endfor %}
+
+    <label for="id_position">Position</label>
+    {{ form.position }}
+
+    <div class="actions">
+      <button type="submit">Add player</button>
+      <a href="{% url 'team_detail' team.pk %}">Cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

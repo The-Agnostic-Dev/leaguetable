@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load league_extras %}
+{% block title %}Discipline{% endblock %}
+{% block content %}
+<h1>Discipline</h1>
+<p class="muted">
+  A red card means a one-match ban. Every {{ per_ban|ordinal }} yellow card of the season ({{ per_ban }}, {{ per_ban|add:per_ban }}, ...) is also a one-match ban.
+  Bans are served in the team's next fixture. Yellow cards do not reset during the season.
+</p>
+<table class="table" data-testid="discipline">
+  <thead><tr><th>Player</th><th>Team</th><th class="num">Yellow</th><th class="num">Red</th><th>Status</th></tr></thead>
+  <tbody>
+    {% for row in rows %}
+      <tr data-player="{{ row.player.name }}" class="{% if row.suspended %}suspended{% elif row.warning %}warning{% endif %}">
+        <td class="name">{{ row.player.name }}</td>
+        <td>{{ row.player.team.name }}</td>
+        <td class="num yellows">{{ row.yellows }}</td>
+        <td class="num reds">{{ row.reds }}</td>
+        <td class="status">
+          {% if row.suspended %}
+            Suspended{% if row.misses %}: misses {{ row.misses.home_team.short_name }} v {{ row.misses.away_team.short_name }} ({{ row.misses.kickoff|date:"D j M" }}){% endif %}
+          {% elif row.warning %}
+            One more yellow means a ban
+          {% else %}
+            Available
+          {% endif %}
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5" class="muted">No cards yet this season.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

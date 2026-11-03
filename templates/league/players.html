@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Players{% endblock %}
+{% block content %}
+<div class="heading-row">
+  <h1>Players</h1>
+  <label class="search">Find a player or team <input type="search" id="player-search" placeholder="e.g. Tunde or Yaba" autocomplete="off"></label>
+</div>
+<p class="muted"><span id="player-count">{{ players|length }}</span> registered players.</p>
+<table class="table" id="player-table">
+  <thead><tr><th>Name</th><th>Team</th><th class="num">No.</th><th>Position</th><th class="num">Goals</th></tr></thead>
+  <tbody>
+    {% for player in players %}
+      <tr data-search="{{ player.name|lower }} {{ player.team.name|lower }}">
+        <td class="name">{{ player.name }}</td>
+        <td><a href="{% url 'team_detail' player.team.pk %}">{{ player.team.name }}</a></td>
+        <td class="num">{{ player.shirt_number }}</td>
+        <td>{{ player.get_position_display }}</td>
+        <td class="num">{{ player.goals_scored }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<p class="muted" id="no-matches" hidden>No players match that search.</p>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/players.js' %}"></script>{% endblock %}

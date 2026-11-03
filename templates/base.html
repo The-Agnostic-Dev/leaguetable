@@ -1,0 +1,40 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Leaguetable{% endblock %} · Leaguetable</title>
+  <link rel="stylesheet" href="{% static 'css/site.css' %}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{% url 'standings' %}">Leaguetable <span>Rowe Park Friday Five-a-side</span></a>
+    <nav>
+      <a href="{% url 'standings' %}">Table</a>
+      <a href="{% url 'fixtures' %}">Fixtures</a>
+      <a href="{% url 'scorers' %}">Top scorers</a>
+      <a href="{% url 'discipline' %}">Discipline</a>
+      <a href="{% url 'teams' %}">Teams</a>
+      <a href="{% url 'players' %}">Players</a>
+    </nav>
+    <div class="account">
+      {% if user.is_authenticated %}
+        <span>{{ user.get_full_name|default:user.username }}</span>
+        <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit" class="link">Log out</button></form>
+      {% else %}
+        <a href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}">Log in</a>
+      {% endif %}
+    </div>
+  </header>
+  <main>
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}<li class="{{ message.tags }}">{{ message }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer>Rowe Park, Yaba · Friday nights · All times are Lagos time.</footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

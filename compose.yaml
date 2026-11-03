@@ -1,0 +1,9 @@
+services:
+  web:
+    build: .
+    ports:
+      - "5118:5118"
+    environment:
+      LEAGUETABLE_DEBUG: "0"
+      LEAGUETABLE_SECRET_KEY: "compose-demo-secret-change-me"
+      LEAGUETABLE_ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0,web"

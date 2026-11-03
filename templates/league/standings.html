@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load league_extras %}
+{% block title %}Table{% endblock %}
+{% block content %}
+<h1>League table</h1>
+<table class="table standings" data-testid="standings">
+  <thead>
+    <tr>
+      <th class="num">#</th><th>Team</th>
+      <th class="num" title="Played">P</th><th class="num" title="Won">W</th>
+      <th class="num" title="Drawn">D</th><th class="num" title="Lost">L</th>
+      <th class="num" title="Goals for">GF</th><th class="num" title="Goals against">GA</th>
+      <th class="num" title="Goal difference">GD</th><th class="num">Pts</th><th>Form</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in table %}
+      <tr data-team="{{ row.team.name }}">
+        <td class="num pos">{{ row.position }}</td>
+        <td class="team"><a href="{% url 'team_detail' row.team.pk %}">{{ row.team.name }}</a></td>
+        <td class="num played">{{ row.played }}</td>
+        <td class="num won">{{ row.won }}</td>
+        <td class="num drawn">{{ row.drawn }}</td>
+        <td class="num lost">{{ row.lost }}</td>
+        <td class="num gf">{{ row.goals_for }}</td>
+        <td class="num ga">{{ row.goals_against }}</td>
+        <td class="num gd">{{ row.goal_difference|signed }}</td>
+        <td class="num pts"><strong>{{ row.points }}</strong></td>
+        <td class="form">{% for letter in row.recent_form %}<span class="badge {{ letter }}">{{ letter }}</span>{% endfor %}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<p class="muted small">
+  Win 3 points, draw 1. Teams level on points are separated by goal difference, then goals scored,
+  then points in the games between them, then alphabetically.
+</p>
+{% endblock %}
