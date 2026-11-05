@@ -3,7 +3,7 @@ referees and team captains. Everything else is public."""
 
 from django.contrib.auth.models import AnonymousUser, User
 
-from .models import Team
+from .models import Fixture, Team
 
 SECRETARY_GROUP = "Secretary"
 REFEREE_GROUP = "Referees"
@@ -21,6 +21,14 @@ def is_secretary(user: User | AnonymousUser) -> bool:
 
 def can_enter_results(user: User | AnonymousUser) -> bool:
     return _in_group(user, SECRETARY_GROUP, REFEREE_GROUP)
+
+
+def can_enter_result(user: User | AnonymousUser, fixture: Fixture) -> bool:
+    if can_enter_results(user):
+        return True
+    if not user.is_authenticated:
+        return False
+    return user.pk in (fixture.home_team.captain_id, fixture.away_team.captain_id)
 
 
 def can_manage_squad(user: User | AnonymousUser, team: Team) -> bool:

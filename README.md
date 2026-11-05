@@ -5,8 +5,8 @@ a double round robin on Friday nights, and one place where everybody can check t
 
 - **Table**: points, goal difference, form, with the league's tie-breakers.
 - **Fixtures**: by matchday, grouped by day, with results and goalscorers.
-- **Results**: the referee or the secretary enters the score, the scorers and the cards after each game,
-  and can correct it later.
+- **Results**: the referee, the secretary, or the captain of either team enters the score, the scorers
+  and the cards after each game, and can correct it later.
 - **Top scorers** and **Discipline** (cards and suspensions).
 - **Teams and players**: captains manage their own squad.
 
@@ -46,10 +46,10 @@ All demo accounts use the password `leaguetable2026`.
 | --- | --- | --- |
 | `secretary` | Funmilayo Adebayo, league secretary | Everything: enter and correct results, clear a result, reschedule or postpone fixtures, manage any squad |
 | `referee` | Sule Ibrahim, referee | Enter and correct results |
-| `captain.yaba`, `captain.lekki`, `captain.surulere`, `captain.ikoyi`, `captain.ajah`, `captain.ikeja`, `captain.gbagada`, `captain.festac` | Team captains | Add and remove players in their own squad |
+| `captain.yaba`, `captain.lekki`, `captain.surulere`, `captain.ikoyi`, `captain.ajah`, `captain.ikeja`, `captain.gbagada`, `captain.festac` | Team captains | Add and remove players in their own squad; enter and correct results for matches involving their team |
 | `admin` | Superuser | Django admin at `/admin/` |
 
-Captains cannot enter or change results: send the score to the referee or the secretary.
+Captains can enter and correct results for their own team's matches.
 Everything else (table, fixtures, scorers, discipline, teams, players) is public, no login needed.
 
 ## Demo season

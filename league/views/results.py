@@ -3,21 +3,31 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from .. import permissions
 from ..forms import ResultEntry
-from ..models import Fixture
+from ..models import Fixture, Team
 from ..services import results as result_service
 
 
 @login_required
 def enter_result(request: HttpRequest, pk: int) -> HttpResponse:
-    if not permissions.can_enter_results(request.user):
+    if not (
+        permissions.can_enter_results(request.user)
+        or Team.objects.filter(captain=request.user).exists()
+    ):
         raise PermissionDenied
-    fixture = get_object_or_404(Fixture.objects.select_related("home_team", "away_team"), pk=pk)
+    try:
+        fixture = Fixture.objects.select_related("home_team", "away_team").get(pk=pk)
+    except Fixture.DoesNotExist:
+        if not permissions.can_enter_results(request.user):
+            raise PermissionDenied
+        raise Http404
+    if not permissions.can_enter_result(request.user, fixture):
+        raise PermissionDenied
     if fixture.status == Fixture.Status.POSTPONED:
         messages.error(request, "This fixture is postponed. Reschedule it before entering a result.")
         return redirect("fixture_detail", pk=fixture.pk)
