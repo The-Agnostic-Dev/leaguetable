@@ -92,6 +92,27 @@ class PermissionTests(TestCase):
         self.client.force_login(captain)
         self.assertEqual(self.client.get(reverse("enter_result", args=[self.fixture.pk])).status_code, 403)
 
+    def test_fixture_detail_shows_result_entry_to_home_captain(self):
+        captain = f.user("captain.yaba")
+        self.home.captain = captain
+        self.home.save()
+        self.client.force_login(captain)
+        response = self.client.get(reverse("fixture_detail", args=[self.fixture.pk]))
+        self.assertContains(response, reverse("enter_result", args=[self.fixture.pk]))
+
+    def test_fixture_detail_hides_result_entry_from_unrelated_captain(self):
+        other_team = f.team("Ajah Warriors", short_name="AJA")
+        captain = f.user("captain.ajah")
+        other_team.captain = captain
+        other_team.save()
+        self.client.force_login(captain)
+        response = self.client.get(reverse("fixture_detail", args=[self.fixture.pk]))
+        self.assertNotContains(response, reverse("enter_result", args=[self.fixture.pk]))
+
+    def test_fixture_detail_hides_result_entry_from_anonymous_user(self):
+        response = self.client.get(reverse("fixture_detail", args=[self.fixture.pk]))
+        self.assertNotContains(response, reverse("enter_result", args=[self.fixture.pk]))
+
     def test_referee_can_enter_results(self):
         self.client.force_login(f.referee())
         self.assertEqual(self.client.get(reverse("enter_result", args=[self.fixture.pk])).status_code, 200)

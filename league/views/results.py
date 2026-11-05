@@ -9,12 +9,17 @@ from django.views.decorators.http import require_POST
 
 from .. import permissions
 from ..forms import ResultEntry
-from ..models import Fixture
+from ..models import Fixture, Team
 from ..services import results as result_service
 
 
 @login_required
 def enter_result(request: HttpRequest, pk: int) -> HttpResponse:
+    if not (
+        permissions.can_enter_results(request.user)
+        or Team.objects.filter(captain=request.user).exists()
+    ):
+        raise PermissionDenied
     fixture = get_object_or_404(Fixture.objects.select_related("home_team", "away_team"), pk=pk)
     if not permissions.can_enter_result(request.user, fixture):
         raise PermissionDenied
