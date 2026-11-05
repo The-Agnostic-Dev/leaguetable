@@ -86,9 +86,9 @@ def _sort_rows(rows: list[Row], played: list[Fixture]) -> list[Row]:
         h2h = _head_to_head_points(tied, played) if len(tied) > 1 else {}
         tied.sort(
             key=lambda row: (
-                -h2h.get(row.team.pk, 0),
                 -row.goal_difference,
                 -row.goals_for,
+                -h2h.get(row.team.pk, 0),
                 row.team.name,
             )
         )
@@ -103,10 +103,10 @@ def build_table() -> list[Row]:
 
     for fixture in fixtures:
         home, away = rows[fixture.home_team_id], rows[fixture.away_team_id]
-        home.played += 1
-        away.played += 1
         if not fixture.is_played:
             continue
+        home.played += 1
+        away.played += 1
         _record(home, fixture.home_goals, fixture.away_goals)
         _record(away, fixture.away_goals, fixture.home_goals)
         played.append(fixture)
