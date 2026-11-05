@@ -52,11 +52,11 @@ class TopScorersTests(TestCase):
 
         scorers_list = list(scorers.top_scorers())
         self.assertEqual(len(scorers_list), 3)
-        self.assertEqual([s.goals_scored for s in scorers_list], [3, 2, 1])
+        self.assertEqual([s.goals for s in scorers_list], [3, 2, 1])
         self.assertEqual([s.rank for s in scorers_list], [1, 2, 3])
-        self.assertEqual(scorers_list[0].name, "Player One")
-        self.assertEqual(scorers_list[1].name, "Player Two")
-        self.assertEqual(scorers_list[2].name, "Player Three")
+        self.assertEqual(scorers_list[0].player.name, "Player One")
+        self.assertEqual(scorers_list[1].player.name, "Player Two")
+        self.assertEqual(scorers_list[2].player.name, "Player Three")
 
     def test_tied_players_share_rank_and_next_skips(self):
         User = get_user_model()
@@ -100,5 +100,5 @@ class TopScorersTests(TestCase):
 
         scorers_list = list(scorers.top_scorers())
         self.assertEqual(len(scorers_list), 3)
-        self.assertEqual([s.goals_scored for s in scorers_list], [2, 2, 1])
+        self.assertEqual([s.goals for s in scorers_list], [2, 2, 1])
         self.assertEqual([s.rank for s in scorers_list], [1, 1, 3])
