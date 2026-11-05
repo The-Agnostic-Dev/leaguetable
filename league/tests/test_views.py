@@ -2,7 +2,7 @@ from django.core.cache import cache
 from django.test import TestCase
 from django.urls import reverse
 
-from league.models import Player
+from league.models import Fixture, Player
 from league.services import scorers, standings as standings_service
 
 from . import factories as f
@@ -153,6 +153,19 @@ class PermissionTests(TestCase):
     def test_referee_can_enter_results(self):
         self.client.force_login(f.referee())
         self.assertEqual(self.client.get(reverse("enter_result", args=[self.fixture.pk])).status_code, 200)
+
+    def test_captain_gets_403_for_nonexistent_result(self):
+        captain = f.user("captain.yaba")
+        self.home.captain = captain
+        self.home.save()
+        self.client.force_login(captain)
+        url = reverse("enter_result", args=[self.fixture.pk + 1000])
+        self.assertEqual(self.client.get(url).status_code, 403)
+
+    def test_referee_gets_404_for_nonexistent_result(self):
+        self.client.force_login(f.referee())
+        url = reverse("enter_result", args=[self.fixture.pk + 1000])
+        self.assertEqual(self.client.get(url).status_code, 404)
 
     def test_captain_adds_player_to_own_team_only(self):
         captain = f.user("captain.yaba")
