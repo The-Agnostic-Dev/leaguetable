@@ -57,11 +57,12 @@ class StandingsTests(TestCase):
         self.assertEqual(table["Bravo"].goal_difference, -1)
 
     def test_goal_difference_ranks_before_head_to_head(self):
-        a, b, c = (f.team(n, short_name=n[:3].upper()) for n in ("Alpha", "Bravo", "Charlie"))
+        a, b, c, d = (f.team(n, short_name=n[:3].upper()) for n in ("Alpha", "Bravo", "Charlie", "Delta"))
         f.played(a, b, 1, 0)   # Alpha beat Bravo (head-to-head favours Alpha)
         f.played(c, a, 3, 1)   # Charlie beat Alpha
         f.played(b, c, 2, 0)   # Bravo beat Charlie
-        # Alpha: 3 pts, GF 2, GA 3, GD -1; Bravo: 3 pts, GF 2, GA 1, GD +1.
+        f.played(c, d, 2, 2)   # Charlie draw Delta so Charlie finishes on 4 points
+        # Alpha: 3 pts, GD -1; Bravo: 3 pts, GD +1; only these two level on points.
         order = [row.team.name for row in standings.build_table()]
         self.assertLess(order.index("Bravo"), order.index("Alpha"))
 
