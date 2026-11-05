@@ -48,7 +48,18 @@ class StandingsTests(TestCase):
         # Alpha and Bravo: 3 points, GD +1 each; Alpha has more goals scored (4 vs 2)
         # but Bravo won the head-to-head, so Bravo ranks higher.
         order = [row.team.name for row in standings.build_table()]
-        self.assertLess(order.index("Bravo"), order.index("Alpha"))
+        self.assertEqual(order, ["Bravo", "Delta", "Alpha", "Charlie"])
+
+    def test_goals_scored_breaks_tie_after_head_to_head_draw(self):
+        a, z, c = f.team("Alpha", short_name="ALP"), f.team("Zulu", short_name="ZUL"), f.team("Charlie", short_name="CHA")
+        f.played(a, z, 1, 1)  # head-to-head draw
+        f.played(a, c, 1, 0)  # Alpha wins 1-0
+        f.played(z, c, 2, 1)  # Zulu wins 2-1
+        # Alpha and Zulu: 4 points, GD +1 each; head-to-head is a draw.
+        # Zulu scored more goals (3 vs 2), so Zulu ranks higher despite
+        # being alphabetically later.
+        order = [row.team.name for row in standings.build_table()]
+        self.assertLess(order.index("Zulu"), order.index("Alpha"))
 
     def test_played_counts_only_fixtures_with_result(self):
         a, b = f.team("Alpha", short_name="ALP"), f.team("Bravo", short_name="BRA")
