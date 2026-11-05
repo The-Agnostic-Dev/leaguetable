@@ -89,3 +89,14 @@ class PermissionTests(TestCase):
     def test_only_secretary_can_reschedule(self):
         self.client.force_login(f.referee())
         self.assertEqual(self.client.get(reverse("edit_fixture", args=[self.fixture.pk])).status_code, 403)
+
+    def test_result_form_has_empty_form_templates_matching_formset_prefixes(self):
+        self.client.force_login(f.referee())
+        response = self.client.get(reverse("enter_result", args=[self.fixture.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="goals-rows"')
+        self.assertContains(response, 'id="goals-empty-form"')
+        self.assertContains(response, 'id="cards-rows"')
+        self.assertContains(response, 'id="cards-empty-form"')
+        self.assertContains(response, 'id_goals-TOTAL_FORMS')
+        self.assertContains(response, 'id_cards-TOTAL_FORMS')
