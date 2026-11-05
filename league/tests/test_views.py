@@ -84,6 +84,43 @@ class PermissionTests(TestCase):
         home_row = next(row for row in table if row.team.pk == self.home.pk)
         self.assertEqual((home_row.played, home_row.won, home_row.goals_for, home_row.goals_against), (1, 1, 2, 1))
 
+    def test_away_captain_can_enter_and_post_result(self):
+        captain = f.user("captain.lekki")
+        self.away.captain = captain
+        self.away.save()
+        self.client.force_login(captain)
+        url = reverse("enter_result", args=[self.fixture.pk])
+        self.assertEqual(self.client.get(url).status_code, 200)
+        response = self.client.post(url, {
+            "home_goals": "1",
+            "away_goals": "3",
+            "goals-TOTAL_FORMS": "0",
+            "goals-INITIAL_FORMS": "0",
+            "goals-MIN_NUM_FORMS": "0",
+            "goals-MAX_NUM_FORMS": "1000",
+            "cards-TOTAL_FORMS": "0",
+            "cards-INITIAL_FORMS": "0",
+            "cards-MIN_NUM_FORMS": "0",
+            "cards-MAX_NUM_FORMS": "1000",
+        })
+        self.assertRedirects(response, reverse("fixture_detail", args=[self.fixture.pk]))
+        self.fixture.refresh_from_db()
+        self.assertTrue(self.fixture.is_played)
+        self.assertEqual(self.fixture.home_goals, 1)
+        self.assertEqual(self.fixture.away_goals, 3)
+        response = self.client.get(reverse("fixture_detail", args=[self.fixture.pk]))
+        self.assertContains(response, reverse("enter_result", args=[self.fixture.pk]))
+        table = standings_service.get_table()
+        away_row = next(row for row in table if row.team.pk == self.away.pk)
+        self.assertEqual((away_row.played, away_row.won, away_row.goals_for, away_row.goals_against), (1, 1, 3, 1))
+
+    def test_plain_authenticated_user_cannot_enter_result(self):
+        user = f.user("plain.user")
+        self.client.force_login(user)
+        url = reverse("enter_result", args=[self.fixture.pk])
+        self.assertEqual(self.client.get(url).status_code, 403)
+        self.assertEqual(self.client.post(url, {}).status_code, 403)
+
     def test_unrelated_captain_cannot_enter_results(self):
         other_team = f.team("Ajah Warriors", short_name="AJA")
         captain = f.user("captain.ajah")
