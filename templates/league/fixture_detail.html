@@ -22,7 +22,7 @@
     {% endif %}
   {% endif %}
   <div class="actions">
-    {% if can_enter_results and fixture.status != "postponed" %}
+    {% if can_enter_result and fixture.status != "postponed" %}
       <a class="button" href="{% url 'enter_result' fixture.pk %}">{% if fixture.is_played %}Edit result{% else %}Enter result{% endif %}</a>
     {% endif %}
     {% if is_secretary %}
