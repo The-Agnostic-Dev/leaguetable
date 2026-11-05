@@ -22,7 +22,7 @@ def top_scorers() -> list[ScorerRow]:
         Player.objects.select_related("team")
         .annotate(goals_scored=Count("goals"))
         .filter(goals_scored__gt=0)
-        .order_by("goals_scored", "name")
+        .order_by("-goals_scored", "name")
     )
     rows: list[ScorerRow] = []
     previous_goals = None
