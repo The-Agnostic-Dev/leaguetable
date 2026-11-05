@@ -27,7 +27,7 @@
         {% for form in entry.goals %}{% include "league/_event_row.html" %}{% endfor %}
       </div>
       <button type="button" class="secondary" data-add-row="goals">Add scorer</button>
-      <template id="goal-empty-form">{% with form=entry.goals.empty_form %}{% include "league/_event_row.html" %}{% endwith %}</template>
+      <template id="goals-empty-form">{% with form=entry.goals.empty_form %}{% include "league/_event_row.html" %}{% endwith %}</template>
     </fieldset>
 
     <fieldset>
