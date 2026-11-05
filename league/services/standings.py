@@ -1,7 +1,7 @@
 """The league table.
 
 Order (see README, "How the table is sorted"): points, then goal difference,
-then goals scored, then head-to-head points between the teams still level,
+then head-to-head points between the teams still level, then goals scored,
 then team name.
 """
 
@@ -87,8 +87,8 @@ def _sort_rows(rows: list[Row], played: list[Fixture]) -> list[Row]:
         tied.sort(
             key=lambda row: (
                 -row.goal_difference,
-                -row.goals_for,
                 -h2h.get(row.team.pk, 0),
+                -row.goals_for,
                 row.team.name,
             )
         )
