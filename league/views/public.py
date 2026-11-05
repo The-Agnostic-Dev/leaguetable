@@ -47,6 +47,7 @@ def fixture_detail(request: HttpRequest, pk: int) -> HttpResponse:
             "home_goals": [g for g in goals if g.player.team_id == fixture.home_team_id],
             "away_goals": [g for g in goals if g.player.team_id == fixture.away_team_id],
             "cards": cards,
+            "can_enter_result": permissions.can_enter_result(request.user, fixture),
         },
     )
 

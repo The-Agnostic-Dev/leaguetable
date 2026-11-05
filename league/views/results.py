@@ -15,9 +15,9 @@ from ..services import results as result_service
 
 @login_required
 def enter_result(request: HttpRequest, pk: int) -> HttpResponse:
-    if not permissions.can_enter_results(request.user):
-        raise PermissionDenied
     fixture = get_object_or_404(Fixture.objects.select_related("home_team", "away_team"), pk=pk)
+    if not permissions.can_enter_result(request.user, fixture):
+        raise PermissionDenied
     if fixture.status == Fixture.Status.POSTPONED:
         messages.error(request, "This fixture is postponed. Reschedule it before entering a result.")
         return redirect("fixture_detail", pk=fixture.pk)

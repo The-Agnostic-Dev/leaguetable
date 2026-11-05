@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from league.models import Player
-from league.services import scorers
+from league.services import scorers, standings
 
 from . import factories as f
 
@@ -60,6 +60,49 @@ class PermissionTests(TestCase):
         captain = f.user("captain.yaba")
         self.client.force_login(captain)
         self.assertEqual(self.client.get(reverse("enter_result", args=[self.fixture.pk])).status_code, 403)
+
+    def test_captain_can_enter_result_for_own_team(self):
+        captain = f.user("captain.yaba")
+        self.home.captain = captain
+        self.home.save()
+        self.client.force_login(captain)
+        response = self.client.post(
+            reverse("enter_result", args=[self.fixture.pk]),
+            {
+                "home_goals": 2,
+                "away_goals": 1,
+                "goals-TOTAL_FORMS": 0,
+                "goals-INITIAL_FORMS": 0,
+                "goals-MIN_NUM_FORMS": 0,
+                "goals-MAX_NUM_FORMS": 1000,
+                "cards-TOTAL_FORMS": 0,
+                "cards-INITIAL_FORMS": 0,
+                "cards-MIN_NUM_FORMS": 0,
+                "cards-MAX_NUM_FORMS": 1000,
+            },
+        )
+        self.assertRedirects(response, reverse("fixture_detail", args=[self.fixture.pk]))
+        self.fixture.refresh_from_db()
+        self.assertTrue(self.fixture.is_played)
+        self.assertEqual(self.fixture.home_goals, 2)
+        self.assertEqual(self.fixture.away_goals, 1)
+        table = standings.get_table()
+        row = next(r for r in table if r.team.pk == self.home.pk)
+        self.assertEqual(row.played, 1)
+        self.assertEqual(row.won, 1)
+        self.assertEqual(row.points, 3)
+        self.assertEqual(row.goals_for, 2)
+        self.assertEqual(row.goals_against, 1)
+
+    def test_captain_cannot_enter_result_for_other_teams(self):
+        captain = f.user("captain.yaba")
+        self.home.captain = captain
+        self.home.save()
+        other_home, other_away = f.team("Other Home", short_name="OTH"), f.team("Other Away", short_name="OTW")
+        other_fixture = f.fixture(other_home, other_away)
+        self.client.force_login(captain)
+        response = self.client.get(reverse("enter_result", args=[other_fixture.pk]))
+        self.assertEqual(response.status_code, 403)
 
     def test_referee_can_enter_results(self):
         self.client.force_login(f.referee())
