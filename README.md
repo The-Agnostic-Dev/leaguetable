@@ -65,11 +65,11 @@ Matchdays 1 to 6 are already played (the last six Fridays); matchday 7 is the co
 Win 3 points, draw 1, loss 0. Teams level on points are separated, in this order, by:
 
 1. goal difference,
-2. goals scored,
-3. head to head: points in the games between the teams that are still level,
+2. head to head: points in the games between the teams that are still level,
+3. goals scored,
 4. team name (alphabetical).
 
-So head to head only matters when goal difference *and* goals scored are both level.
+So head to head matters when goal difference is level; if the head-to-head games are drawn, then goals scored decides.
 
 P (played) counts only games that have a result. Postponed games are not counted until they are played.
 
